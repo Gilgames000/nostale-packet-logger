@@ -26,9 +26,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  fdwReason, LPVOID lpvReserved)
 	{
 	case DLL_PROCESS_ATTACH:
 		startLogger();
-		hookSend();
-		hookRecv();
-		CreateThread(nullptr, 0, UnloadDll, hModule, 0, nullptr);
+		if (findAddresses() && hookSend() && hookRecv())
+			CreateThread(nullptr, 0, UnloadDll, hModule, 0, nullptr);
 		break;
 	case DLL_PROCESS_DETACH:
 		unhookSend();

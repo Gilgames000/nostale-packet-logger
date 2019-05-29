@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include "packet_logger.h"
 #include "hooking.h"
+#include "memscan.h"
 
+
+LPVOID sendAddy;
+LPVOID recvAddy;
 
 void customSend()
 {
@@ -43,39 +47,55 @@ void stopLogger()
 	FreeConsole();
 }
 
-void hookSend()
+bool findAddresses()
+{
+	sendAddy = findPattern((BYTE*)SEND_PATTERN, (char*)SEND_MASK, SEND_LEN);
+	recvAddy = findPattern((BYTE*)RECV_PATTERN, (char*)RECV_MASK, RECV_LEN);
+
+	return sendAddy && recvAddy;
+}
+
+bool hookSend()
 {
 	bool outcome;
 
 	printf("[INFO]: Hooking send function... ");
-	outcome = hookFunction((LPVOID)SEND_ADDRESS, customSend);
+	outcome = hookFunction(sendAddy, customSend);
 	printf("%s\n", outcome ? "SUCCESS" : "FAILURE");
+
+	return outcome;
 }
 
-void unhookSend()
-{
-	bool outcome;
-
-	printf("[INFO]: Unhooking send function... ");
-	outcome = unhookFunction((LPVOID)SEND_ADDRESS);
-	printf("%s\n", outcome ? "SUCCESS" : "FAILURE");
-}
-
-void hookRecv()
+bool hookRecv()
 {
 	bool outcome;
 
 	printf("[INFO]: Hooking recv function... ");
-	outcome = hookFunction((LPVOID)RECV_ADDRESS, customRecv);
+	outcome = hookFunction(recvAddy, customRecv);
 	printf("%s\n", outcome ? "SUCCESS" : "FAILURE");
+
+	return outcome;
 }
 
-void unhookRecv()
+bool unhookSend()
+{
+	bool outcome;
+
+	printf("[INFO]: Unhooking send function... ");
+	outcome = unhookFunction(sendAddy);
+	printf("%s\n", outcome ? "SUCCESS" : "FAILURE");
+
+	return outcome;
+}
+
+bool unhookRecv()
 {
 	bool outcome;
 
 	printf("[INFO]: Unhooking recv function... ");
-	outcome = unhookFunction((LPVOID)RECV_ADDRESS);
+	outcome = unhookFunction(recvAddy);
 	printf("%s\n", outcome ? "SUCCESS" : "FAILURE");
+
+	return outcome;
 }
 
