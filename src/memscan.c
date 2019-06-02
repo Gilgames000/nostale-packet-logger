@@ -13,7 +13,7 @@ LPVOID FindPattern(const BYTE *lpPattern, LPCSTR szMask)
     {
         // If the pattern is found, return the address at which it begins
         for (i = 0; i < dwLength && (szMask[i] == '?' || *(BYTE*)(j + i) == lpPattern[i]); ++i);
-        if (i == dwLength) return j;
+        if (i == dwLength) return (LPVOID)j;
     }
 
     return NULL;
