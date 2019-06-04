@@ -1,9 +1,5 @@
 #pragma once
+#include "safequeue.h"
 
-BOOL FindAddresses();
-VOID StartLogger();
-VOID StopLogger();
-BOOL HookSend();
-BOOL HookRecv();
-BOOL UnhookSend();
-BOOL UnhookRecv();
+BOOL StartLogger(SafeQueue* sqSendPackets, SafeQueue* sqRecvPackets);
+BOOL StopLogger();

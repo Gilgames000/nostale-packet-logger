@@ -4,7 +4,6 @@
 #include "hooking.h"
 #include "memscan.h"
 
-
 const BYTE SEND_PATTERN[] = { 0x53, 0x56, 0x8B, 0xF2, 0x8B, 0xD8, 0xEB, 0x04 };
 const BYTE RECV_PATTERN[] = { 0x55, 0x8B, 0xEC, 0x83, 0xC4, 0xF4, 0x53, 0x56, 0x57, 0x33, 0xC9, 0x89, 0x4D, 0xF4, 0x89, 0x55, 0xFC, 0x8B, 0xD8, 0x8B, 0x45, 0xFC };
 LPCSTR SEND_MASK = "xxxxxxxx";
@@ -12,6 +11,16 @@ LPCSTR RECV_MASK = "xxxxxxxxxxxxxxxxxxxxxx";
 
 LPVOID lpvSendAddy;
 LPVOID lpvRecvAddy;
+
+SafeQueue* qSend;
+SafeQueue* qRecv;
+
+BOOL FindAddresses();
+BOOL HookSend();
+BOOL HookRecv();
+BOOL UnhookSend();
+BOOL UnhookRecv();
+
 
 void CustomSend()
 {
@@ -22,6 +31,7 @@ void CustomSend()
         MOV szPacket, EDX
     }
 
+    qSend->push(szPacket);
     printf("[SEND]: %s\n", szPacket);
 }
 
@@ -34,22 +44,31 @@ void CustomRecv()
         MOV szPacket, EDX
     }
 
+    qRecv->push(szPacket);
     printf("[RECV]: %s", szPacket);
 }
 
-void StartLogger()
+BOOL StartLogger(SafeQueue* qSendPackets, SafeQueue* qRecvPackets)
 {
     FILE* pDummy;
+
+    qSend = qSendPackets;
+    qRecv = qRecvPackets;
 
     AllocConsole();
     freopen_s(&pDummy, "CONIN$", "r", stdin);
     freopen_s(&pDummy, "CONOUT$", "w", stdout);
     freopen_s(&pDummy, "CONOUT$", "w", stderr);
+
+    return FindAddresses() && HookSend() && HookRecv();
 }
 
-void StopLogger()
+BOOL StopLogger()
 {
+    BOOL bOutcome = UnhookSend() && UnhookRecv();
     FreeConsole();
+
+    return bOutcome;
 }
 
 BOOL FindAddresses()
