@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="nostale_string.h" />
     <ClInclude Include="packet_logger.h" />
     <ClInclude Include="hooking.h" />
     <ClInclude Include="memscan.h" />

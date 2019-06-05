@@ -20,6 +20,9 @@
     <ClInclude Include="memscan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="nostale_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.c">
