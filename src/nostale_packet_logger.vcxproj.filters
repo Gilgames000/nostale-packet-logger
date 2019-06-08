@@ -23,6 +23,12 @@
     <ClInclude Include="nostale_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="safequeue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main_form.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.c">
@@ -35,6 +41,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="packet_logger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="safequeue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

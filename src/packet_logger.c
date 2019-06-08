@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <stdio.h>
 #include "packet_logger.h"
 #include "hooking.h"
 #include "memscan.h"
@@ -27,6 +26,7 @@ BOOL UnhookSend();
 BOOL UnhookRecv();
 
 
+#pragma managed(push, off)
 void CustomSend()
 {
     LPSTR szPacket;
@@ -37,7 +37,6 @@ void CustomSend()
     }
 
     qSend->push(szPacket);
-    printf("[SEND]: %s\n", szPacket);
 }
 
 void CustomRecv()
@@ -50,7 +49,6 @@ void CustomRecv()
     }
 
     qRecv->push(szPacket);
-    printf("[RECV]: %s", szPacket);
 }
 
 void SendPacket(LPCSTR szPacket)
@@ -83,89 +81,49 @@ void ReceivePacket(LPCSTR szPacket)
         CALL lpvRecvAddy
     }
 }
+#pragma managed(pop)
 
 BOOL StartLogger(SafeQueue* qSendPackets, SafeQueue* qRecvPackets)
 {
-    FILE* pDummy;
-
     qSend = qSendPackets;
     qRecv = qRecvPackets;
-
-    AllocConsole();
-    freopen_s(&pDummy, "CONIN$", "r", stdin);
-    freopen_s(&pDummy, "CONOUT$", "w", stdout);
-    freopen_s(&pDummy, "CONOUT$", "w", stderr);
 
     return FindAddresses() && HookSend() && HookRecv();
 }
 
 BOOL StopLogger()
 {
-    BOOL bOutcome = UnhookSend() && UnhookRecv();
-    FreeConsole();
-
-    return bOutcome;
+    return UnhookSend() && UnhookRecv();
 }
 
 BOOL FindAddresses()
 {
-    printf("[INFO]: Scanning process memory to find send address... ");
     lpvSendAddy = FindPattern(SEND_PATTERN, SEND_MASK);
-    printf("%s\n", lpvSendAddy ? "SUCCESS" : "FAILURE");
-
-    printf("[INFO]: Scanning process memory to find recv address... ");
     lpvRecvAddy = FindPattern(RECV_PATTERN, RECV_MASK);
-    printf("%s\n", lpvRecvAddy ? "SUCCESS" : "FAILURE");
 
-    printf("[INFO]: Scanning process memory to find first argument address... ");
     DWORD pThisPacket = (DWORD_PTR)FindPattern(PACKET_THIS_PATTERN, PACKET_THIS_MASK) + 0x1;
     lpvPacketThis = (LPVOID)*(DWORD*)pThisPacket;
-    printf("%s\n", lpvPacketThis ? "SUCCESS" : "FAILURE");
 
     return lpvSendAddy && lpvRecvAddy && lpvPacketThis;
 }
 
 BOOL HookSend()
 {
-    BOOL bOutcome;
-
-    printf("[INFO]: Hooking send function... ");
-    bOutcome = HookFunction(lpvSendAddy, CustomSend);
-    printf("%s\n", bOutcome ? "SUCCESS" : "FAILURE");
-
-    return bOutcome;
+    return HookFunction(lpvSendAddy, CustomSend);
 }
 
 BOOL HookRecv()
 {
-    BOOL bOutcome;
-
-    printf("[INFO]: Hooking recv function... ");
-    bOutcome = HookFunction(lpvRecvAddy, CustomRecv);
-    printf("%s\n", bOutcome ? "SUCCESS" : "FAILURE");
-
-    return bOutcome;
+    return HookFunction(lpvRecvAddy, CustomRecv);
 }
 
 BOOL UnhookSend()
 {
-    BOOL bOutcome;
-
-    printf("[INFO]: Unhooking send function... ");
-    bOutcome = UnhookFunction(lpvSendAddy);
-    printf("%s\n", bOutcome ? "SUCCESS" : "FAILURE");
-
-    return bOutcome;
+    return UnhookFunction(lpvSendAddy);
 }
 
 BOOL UnhookRecv()
 {
-    BOOL bOutcome;
-
-    printf("[INFO]: Unhooking recv function... ");
-    bOutcome = UnhookFunction(lpvRecvAddy);
-    printf("%s\n", bOutcome ? "SUCCESS" : "FAILURE");
-
-    return bOutcome;
+    return UnhookFunction(lpvRecvAddy);
 }
 

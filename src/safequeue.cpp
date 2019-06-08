@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <stdio.h>
 #include "safequeue.h"
 
 
@@ -11,6 +10,7 @@ SafeQueue::SafeQueue()
 
 SafeQueue::~SafeQueue()
 {
+    CloseHandle(m_ghMutex);
 }
 
 void SafeQueue::push(char* packet)

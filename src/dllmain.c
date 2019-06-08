@@ -1,23 +1,14 @@
 #include <SDKDDKVer.h>
 #include <windows.h>
-#include <stdio.h>
-#include "packet_logger.h"
 
+extern int GuiMain();
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved);
-DWORD WINAPI UnloadDll(LPVOID lpParameter);
+DWORD WINAPI StartGui(LPVOID lpParameter);
 
-DWORD WINAPI UnloadDll(LPVOID hModule) {
-
-    printf("[INFO]: Press VK_END to unload the dll\n");
-    while (1)
-    {
-        if (GetAsyncKeyState(VK_END) & 1)
-        {
-            printf("[INFO]: VK_END pressed; unloading the dll...\n");
-            FreeLibraryAndExitThread((HMODULE)hModule, 0);
-        }
-    }
+DWORD WINAPI StartGui(LPVOID hModule)
+{
+    FreeLibraryAndExitThread((HMODULE)hModule, GuiMain());
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  fdwReason, LPVOID lpvReserved)
@@ -25,16 +16,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  fdwReason, LPVOID lpvReserved)
     switch (fdwReason)
     {
     case DLL_PROCESS_ATTACH:
-        StartLogger();
-        if (FindAddresses() && HookSend() && HookRecv())
-            CreateThread(NULL, 0, UnloadDll, hModule, 0, NULL);
-        else return FALSE;
+		DisableThreadLibraryCalls(hModule);
+        CreateThread(NULL, 0, StartGui, hModule, 0, NULL);
         break;
     case DLL_PROCESS_DETACH:
-        UnhookSend();
-        UnhookRecv();
-        StopLogger();
-        break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
         break;

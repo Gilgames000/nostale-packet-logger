@@ -1,9 +1,9 @@
 #pragma once
 
-/***************************************************************************************************************************************
- * Big thanks to atom0s for the NostaleString structures                                                                               *
- * https://www.elitepvpers.com/forum/nostale-hacks-bots-cheats-exploits/4183903-source-real-nostalesdk-other-information-sources.html  *
- ***************************************************************************************************************************************/
+/*********************************************************
+ * Big thanks to atom0s for the NostaleString structures *
+ * http://atom0s.com/forums/viewtopic.php?f=21&t=151     *
+ *********************************************************/
 
 struct NostaleStringA
 {
