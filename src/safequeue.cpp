@@ -20,7 +20,7 @@ void SafeQueue::push(char* packet)
 
     len = strlen(packet);
     szPacket = (char*)malloc(len + 1);
-    snprintf(szPacket, len + 1, packet);
+    snprintf(szPacket, len + 1, "%s", packet);
 
     WaitForSingleObject(m_ghMutex, INFINITE);
     m_Queue.push(szPacket);
