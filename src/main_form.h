@@ -852,6 +852,12 @@ namespace nostalepacketlogger {
         *tmp = '\0';
         return packetType;
     }
+    private: System::Void trimNewLine(LPSTR packet) {
+        int pos = strlen(packet) - 1;
+        if (packet[pos] == '\n') {
+            packet[pos] = '\0';
+        }
+    }
     private: System::Void sendWorker_DoWork(System::Object^  sender, System::ComponentModel::DoWorkEventArgs^  e) {
         while (!this->sendWorker->CancellationPending) {
             if (!qSend->empty()) {
@@ -871,6 +877,7 @@ namespace nostalepacketlogger {
             if (!qRecv->empty()) {
                 LPSTR packet = this->qRecv->front();
                 LPSTR packetType = getPacketType(packet);
+                trimNewLine(packet);
                 if (validateRecvFilters(gcnew String(packetType))) {
                     String^ logPacket = "[RECV]: " + gcnew String(packet) + Environment::NewLine;
                     this->textLogger->AppendText(logPacket);
