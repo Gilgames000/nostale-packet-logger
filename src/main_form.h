@@ -858,14 +858,23 @@ namespace nostalepacketlogger {
             packet[pos] = '\0';
         }
     }
+    private: LPSTR getPacketTime() {
+        LPSTR time = (LPSTR)malloc(50);
+        SYSTEMTIME lt;
+        GetLocalTime(&lt);
+        snprintf(time, 49, "[%02d:%02d:%02d.%03d]", lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+        return time;
+    }
     private: System::Void sendWorker_DoWork(System::Object^  sender, System::ComponentModel::DoWorkEventArgs^  e) {
         while (!this->sendWorker->CancellationPending) {
             if (!qSend->empty()) {
                 LPSTR packet = this->qSend->front();
                 LPSTR packetType = getPacketType(packet);
                 if (validateSendFilters(gcnew String(packetType))) {
-                    String^ logPacket = "[SEND]: " + gcnew String(packet) + Environment::NewLine;
+                    LPSTR time = getPacketTime();
+                    String^ logPacket = gcnew String(time) + "[SEND]: " + gcnew String(packet) + Environment::NewLine;
                     this->textLogger->AppendText(logPacket);
+                    free(time);
                 }
                 free(packetType);
                 qSend->pop();
@@ -879,8 +888,10 @@ namespace nostalepacketlogger {
                 LPSTR packetType = getPacketType(packet);
                 trimNewLine(packet);
                 if (validateRecvFilters(gcnew String(packetType))) {
-                    String^ logPacket = "[RECV]: " + gcnew String(packet) + Environment::NewLine;
+                    LPSTR time = getPacketTime();
+                    String^ logPacket = gcnew String(time) + "[RECV]: " + gcnew String(packet) + Environment::NewLine;
                     this->textLogger->AppendText(logPacket);
+                    free(time);
                 }
                 free(packetType);
                 qRecv->pop();
